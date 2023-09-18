@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pengu</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    /* Reset some default styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #222;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #chat-container {
+      width: 100%;
+      height: 100vh;
+      padding: 20px;
+      border-radius: 5px;
+      background-color: #333;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    #chat-box {
+        flex-grow: 1;
+        overflow-y: scroll;
+        border: 1px solid #333;
+        padding: 25px;
+        background-color: #444;
+        border-radius: 5px;
+    }
+
+    #user-input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #333;
+        background-color: #444;
+        color: #fff;
+        border-radius: 5px;
+    }
+
+    .user {
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: end;
+      align-items: end;
+      position: relative;
+    }
+
+    .bot {
+      opacity: 0;
+      margin-bottom: 16px;
+    }
+
+    .bot span,
+    .user span {
+      font-size: 0.8rem;
+      margin-bottom: 5px;
+      color: #ffffff80;
+      width: fit-content;
+    }
+
+    .bot p,
+    .user p {
+      font-size: 1.2rem;
+      background-color: #ffffff;
+      width: fit-content;
+      color: #000000;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .user p {
+      background-color: #3a86ff;
+      color: #fff;
+    }
+
+    /* Add some spacing between messages */
+    .user:last-child,
+    .bot:last-child {
+        margin-bottom: 0;
+    }
+
+    /* Style for the title */
+    h1 {
+        text-align: center;
+    }
+    .form {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .form button {
+      height: 48px;
+      aspect-ratio: 3 / 2;
+      border: none;
+      border-radius: 5px;
+      background-color: #3a86ff;
+      color: #fff;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .form button:hover {
+      background-color: #2f7efc;
+    }
+
+    .bot,
+    .user {
+      animation: appear 1s forwards;
+    }
+
+    .bot {
+      animation-delay: 0.5s;
+    }
+
+    @keyframes appear {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="chat-container">
+    <div id="chat-box">
+      <div class="bot">
+        <span>Pengu, 21:33</span>
+        <p>How can I help you?</p>
+      </div>
+    </div>
+
+    <div class="form">
+      <input type="text" id="user-input" placeholder="Type your message...">
+      <button id="sumbit-form"><i class="fa-solid fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+  <script>
+    const chatBox = document.getElementById("chat-box");
+    const userInput = document.getElementById("user-input");
+
+    function appendMessage(message, sender) {
+      const messageElement = document.createElement("div");
+
+      const time = new Date();
+      const hours = time.getHours();
+      const minutes = time.getMinutes();
+      const timeSpan = document.createElement("span");
+      timeSpan.textContent = `${sender === "bot" ? "Pengu" : "You"}, ${hours}:${minutes}`;
+      messageElement.appendChild(timeSpan);
+
+      const p = document.createElement("p");
+      p.textContent = message;
+      messageElement.appendChild(p);
+
+      messageElement.classList.add(sender);
+      chatBox.appendChild(messageElement);
+    }
+
+    function botResponse(userMessage) {
+      const responses = {
+        "hello": "Hello! How can I help you?",
+        "how Are You": "Good, it is very cold up here! How are you?",
+        "hru": "Good, its very cold up here! How are you?",
+        "bad": "Oh, I am sorry! If I was programmed more I would ask to help!",
+        "good": "Well that is good! Let me know if you need anything else!",
+        "could be better": "Aw, what’s wrong?",
+        "do you know math": "No, I do NOT understand math!",
+        "hi": "Hello, how can I help you?",
+        "how old are you": "1 year old!",
+        "how are you": "I'm doing good! Thanks for asking! If you have any questions with a lesson just ask me!",
+        "i need help with alice and the hole": "Ok, I see you need help with the story Alice And The Hole... Lets Work It Out! The question says... 1. Which way should Alice go? So we need to find out which way Alice should go. Would it be A? Go to the queens castle? No! She doesn't need to go to the castle. So we can mark A out! Could it be B? Nope! Because Alice is already inside the hole! Could it be C? Yes! She needs to ask the cat for help! I hoped this helped!",
+        "i need help with year 2042": "Ok I see you need help with the story Year 2042! I'll gladly help you with it! So in the story Year 2042... The question is 1. What was the most important lesson that Anya learned from her journey to rebuild the world? Lets work this out! Could it be A? Lets see... the question says That one person can make a difference. It would be A. Because the question says 1. What was the most important lesson that Anya learned from her journey to rebuild the world? Thats what can happen if that 1 person tries!",
+        "bye": "Goodbye! Have a great day!",
+        "goodbye": "Goodbye! Have a great day!",
+        "who made you?": "A 7th Grade Student!",
+        "bugga": "Bruh",
+        "who was the greatest nba player of all time": "Lebron James was the best NBA player.",
+        "what is the best western saying": "The best western saying is Hot diggy dog I hope this helped!",
+        "good morning": "Good morning! How can I assist you today?",
+        "good afternoon": "Good afternoon! What can I help you with?",
+        "good evening": "Good evening! How may I assist you?",
+        "help": "Of course! I'm here to help. What do you need assistance with?",
+        "support": "You've got support! How can I assist you today?",
+        "tell me a joke": "Why did the computer keep freezing? Because it left its Windows open!",
+        "thank you": "You're welcome! If you have more questions, feel free to ask.",
+        "hey": "Hello! How can I help you?",
+        "who are you": "I'm a virtual assistant here to provide information and help with your questions.",
+        "where are you from": "I exist in the digital realm, so I don't have a physical location.",
+        "what's your favorite color": "I don't have personal preferences, but I can help you with color-related information.",
+        "do you have any hobbies": "I'm always ready to assist, so I don't have hobbies like humans do.",
+        "can you sing a song": "I'm not equipped for singing, but I can provide song lyrics or information about music.",
+        "what's the weather like": "I don't have real-time data, but I can suggest websites or apps for checking the weather.",
+        "tell me a fun fact": "Sure! Did you know that honey never spoils? Archaeologists have found pots of honey in ancient Egyptian tombs that are over 3,000 years old and still perfectly edible!",
+        "tell me a science fact": "Sure! Here's a science fact: The Earth is about 4.5 billion years old, and it's constantly changing due to geological processes.",
+        "what's the capital of France": "The capital of France is Paris.",
+        "what's the largest mammal": "The blue whale is the largest mammal on Earth. It can grow to be over 98 feet long and weigh as much as 200 tons!",
+        "who won the World Series in 2021": "The Atlanta Braves won the World Series in 2021.",
+        "what's your favorite quote": "I don't have favorites, but here's a famous quote: 'The only thing necessary for the triumph of evil is for good men to do nothing.' - Edmund Burke",
+        "tell me a historical fact": "Certainly! Here's a historical fact: The Great Wall of China is over 13,000 miles long and was built over many centuries to protect against invasions.",
+        "what's your favorite animal": "I don't have preferences, but many people love dolphins for their intelligence and playful nature.",
+        "who's your favorite scientist": "I don't have personal preferences, but Albert Einstein is a well-known scientist known for his theory of relativity.",
+        "what's the speed of light": "The speed of light in a vacuum is approximately 299,792,458 meters per second.",
+        "tell me a space fact": "Sure! Here's a space fact: The Milky Way galaxy, which includes our solar system, is estimated to be about 100,000 light-years in diameter.",
+        "what's your favorite food": "I don't have preferences, but pizza and chocolate are popular choices for many people.",
+        "who's your favorite actor": "I don't have favorites, but actors like Meryl Streep and Tom Hanks are highly regarded in the film industry.",
+      };
+
+      const response = responses[userMessage.toLowerCase()] || "I'm sorry, I don't understand that.";
+
+      appendMessage(response, "bot");
+    }
+
+    userInput.addEventListener("keyup", function(event) {
+      if (event.key === "Enter") {
+        const userMessage = userInput.value;
+        appendMessage(userMessage, "user");
+        botResponse(userMessage);
+        userInput.value = "";
+      }
+    });
+
+    document.querySelector('#sumbit-form').addEventListener("click", function(event) {
+      const userMessage = userInput.value;
+      appendMessage(userMessage, "user");
+      botResponse(userMessage);
+      userInput.value = "";
+    });
+    
+    function setCookie(cname, cvalue, exdays) {
+      const d = new Date();
+      d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+      let expires = "expires="+d.toUTCString();
+      document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    }
+
+    function getCookie(cname) {
+      let name = cname + "=";
+      let ca = document.cookie.split(';');
+      for(let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') {
+          c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+          return c.substring(name.length, c.length);
+        }
+      }
+      return "";
+    }
+
+    function checkCookie() {
+      let user = getCookie("username");
+      if (user != "") {
+        alert("Welcome again " + user);
+      } else {
+        user = prompt("Please enter your name:", "");
+        if (user != "" && user != null) {
+          setCookie("username", user, 365);
+        }
+      }
+    }
+  </script>
+</body>
+</html>
