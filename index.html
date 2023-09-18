@@ -279,6 +279,52 @@
         }
       }
     }
+        // ... (your existing JavaScript code) ...
+
+    // Handle the click event for the bookmark button
+    document.querySelector('#bookmark-button').addEventListener("click", function(event) {
+      // Get the current page URL
+      const currentPageUrl = window.location.href;
+
+      // Retrieve existing bookmarks from localStorage (if any)
+      let bookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
+
+      // Check if the current page URL is already in bookmarks
+      if (bookmarks.includes(currentPageUrl)) {
+        alert("This page is already bookmarked.");
+      } else {
+        // Add the current page URL to bookmarks
+        bookmarks.push(currentPageUrl);
+
+        // Save updated bookmarks to localStorage
+        localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+
+        alert("Page bookmarked successfully.");
+      }
+    });
+
+    // Function to load bookmarks from localStorage
+    function loadBookmarks() {
+      const bookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
+
+      // Display bookmarks (you can customize this part)
+      const bookmarksList = document.createElement("div");
+      bookmarksList.innerHTML = "<h2>Bookmarks:</h2>";
+
+      if (bookmarks.length === 0) {
+        bookmarksList.innerHTML += "<p>No bookmarks saved.</p>";
+      } else {
+        bookmarks.forEach((bookmark, index) => {
+          bookmarksList.innerHTML += `<p>${index + 1}. <a href="${bookmark}" target="_blank">${bookmark}</a></p>`;
+        });
+      }
+
+      // Append bookmarks list to the chat container
+      chatBox.appendChild(bookmarksList);
+    }
+
+    // Load bookmarks when the page loads
+    loadBookmarks();
   </script>
 </body>
 </html>
